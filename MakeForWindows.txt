@@ -1,0 +1,69 @@
+
+message( STATUS "Build ICU for Windows")
+
+set( DEPOTDIR "${CMAKE_CURRENT_LIST_DIR}/filedepot/win")
+set( DIST_DIR "${BUILDDIR}/icu-dist" )
+set( BUILD_ICU_DIR "${BUILDDIR}/icu/source" )
+
+if( EXISTS "${BUILDDIR}/icu" )
+    file( REMOVE_RECURSE "${BUILDDIR}/icu" )
+endif()
+
+if( EXISTS "${DIST_DIR}" )
+    file( REMOVE_RECURSE "${DIST_DIR}" )
+endif()
+
+
+
+if( NOT EXISTS "${BUILDDIR}/icu" )
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xzf "${DEPOTDIR}/icu4c-src.zip"
+        WORKING_DIRECTORY ${BUILDDIR}
+    )
+endif()
+
+file( TO_NATIVE_PATH "${BUILDDIR}" BUILDDIR )
+file( TO_NATIVE_PATH "${DEPOTDIR}" DEPOTDIR )
+set( BUILD_SYS_PATH "${DEPOTDIR}\\ConCygSys-180629\\cygwin\\bin\"" )
+string( PREPEND BUILD_SYS_PATH "set \"PATH=%PATH%;" )
+message( STATUS "bsp: ${BUILD_SYS_PATH}")
+if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" )
+    set( VSWHERE_CMD "${DEPOTDIR}/vswhere.exe" )
+    execute_process(
+        COMMAND ${VSWHERE_CMD} -property installationPath 
+        WORKING_DIRECTORY ${DEPOTDIR}
+        OUTPUT_VARIABLE MSVC_PATH
+    )
+    string(REGEX REPLACE "\n$" "" MSVC_PATH "${MSVC_PATH}" )
+    if( "${CMAKE_SIZEOF_VOID_P}" STREQUAL "8" )
+        set( VSDEVCMD_BAT "call \"${MSVC_PATH}\\Common7\\Tools\\VsDevCmd.bat\" -arch=amd64" )
+    else()
+         set( VSDEVCMD_BAT "call \"${MSVC_PATH}\\Common7\\Tools\\VsDevCmd.bat\"" )
+    endif()
+    set( CONF_ICU "bash runConfigureICU Cygwin/MSVC -prefix=${DIST_DIR} -enable-static -disable-shared" )
+    set( BUILD_CMD_FILE "${BUILD_ICU_DIR}/build.cmd" )
+    file( WRITE ${BUILD_CMD_FILE}  "@echo off \n" )
+    file( APPEND ${BUILD_CMD_FILE} "setlocal \n" )
+    file( APPEND ${BUILD_CMD_FILE} "${BUILD_SYS_PATH} \n" )
+    file( APPEND ${BUILD_CMD_FILE} "${VSDEVCMD_BAT} \n" )
+    file( APPEND ${BUILD_CMD_FILE} "dos2unix *\n" )
+    file( APPEND ${BUILD_CMD_FILE} "dos2unix -f configure\n" )
+    file( APPEND ${BUILD_CMD_FILE} "dos2unix -f configure\n" )
+    file( APPEND ${BUILD_CMD_FILE} "${CONF_ICU} \n" )
+    file( APPEND ${BUILD_CMD_FILE} "make \n" )
+    file( APPEND ${BUILD_CMD_FILE} "make install \n" )
+    file( APPEND ${BUILD_CMD_FILE} "make clean \n" )
+    file( APPEND ${BUILD_CMD_FILE} "make distclean \n" )
+elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" )
+    message( FATAL_ERROR "Not impl for GNU compiler")
+else()
+    message( FATAL_ERROR "Compiler curently not supported!" )
+endif()
+
+execute_process(
+    COMMAND ${BUILD_CMD_FILE} 
+    WORKING_DIRECTORY ${BUILD_ICU_DIR}
+)
+
+
+
