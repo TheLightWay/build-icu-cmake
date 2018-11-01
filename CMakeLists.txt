@@ -50,7 +50,23 @@ endif()
 
 set( BINDIR "${PROJECT_BINARY_DIR}" )
 set( BUILDDIR "${BINDIR}/_icu-build-dir" )
+set( DIST_DIR "${BUILDDIR}/icu-dist" CACHE PATH INTERNAL )
+
+if( EXISTS ${BUILDDIR} )
+    file( REMOVE_RECURSE ${BUILDDIR} )
+endif()
+
 file( MAKE_DIRECTORY ${BUILDDIR} )
+
+set( BUILD_ICU_DIR "${BUILDDIR}/icu/source" )
+
+if( "${CMAKE_SIZEOF_VOID_P}" STREQUAL "8" )
+    set( ICU_WITH_LIB_BITS "-with-library-bits=64" )
+elseif( "${CMAKE_SIZEOF_VOID_P}" STREQUAL "4" )
+    set( ICU_WITH_LIB_BITS "-with-library-bits=32" )    
+else()
+    message( FATAL_ERROR "Unexpected architecture, sizeof(void*): ${CMAKE_SIZEOF_VOID_P}" )
+endif()
 
 if( WIN32 )
     include( ${CMAKE_CURRENT_LIST_DIR}/MakeForWindows.txt )
@@ -59,6 +75,8 @@ elseif( LINUX )
 else()
     message( FATAL_ERROR "Unknown OS" )
 endif()
+
+set( ICU_DISR_DIR "${DIST_DIR}" CACHE PATH INTERNAL )
 
 
 
