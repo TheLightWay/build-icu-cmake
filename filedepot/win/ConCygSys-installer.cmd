@@ -752,7 +752,6 @@ if "%UPDATEMODE%" == "yes" (
 echo.
 echo  Use launchers in [%INSTALL_ROOT%] to run Cygwin Portable.
 echo.
-pause
 :: deleting installer and old launchers
 del "%INSTALL_ROOT%ConCygSys*" >NUL 2>&1
 exit 0

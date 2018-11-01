@@ -2,7 +2,7 @@
 message( STATUS "Build ICU for Windows")
 
 set( DEPOTDIR "${CMAKE_CURRENT_LIST_DIR}/filedepot/win")
-set( DIST_DIR "${BUILDDIR}/icu-dist" )
+set( DIST_DIR "${BUILDDIR}/icu-dist" CACHE PATH INTERNAL )
 set( BUILD_ICU_DIR "${BUILDDIR}/icu/source" )
 
 if( EXISTS "${BUILDDIR}/icu" )
@@ -13,7 +13,9 @@ if( EXISTS "${DIST_DIR}" )
     file( REMOVE_RECURSE "${DIST_DIR}" )
 endif()
 
-
+if( NOT EXISTS "${BUILDDIR}/cygwin" )
+     file( REMOVE_RECURSE "${BUILDDIR}/cygwin" )
+endif()
 
 if( NOT EXISTS "${BUILDDIR}/icu" )
     execute_process(
@@ -22,9 +24,16 @@ if( NOT EXISTS "${BUILDDIR}/icu" )
     )
 endif()
 
+if( NOT EXISTS "${BUILDDIR}/cygwin" )
+    file( COPY "${DEPOTDIR}/ConCygSys-installer.cmd" DESTINATION ${BUILDDIR} )
+    execute_process(
+        COMMAND ConCygSys-installer.cmd
+        WORKING_DIRECTORY ${BUILDDIR}
+    )
+endif()
+
 file( TO_NATIVE_PATH "${BUILDDIR}" BUILDDIR )
-file( TO_NATIVE_PATH "${DEPOTDIR}" DEPOTDIR )
-set( BUILD_SYS_PATH "${DEPOTDIR}\\ConCygSys-180629\\cygwin\\bin\"" )
+set( BUILD_SYS_PATH "${BUILDDIR}\\cygwin\\bin\"" )
 string( PREPEND BUILD_SYS_PATH "set \"PATH=%PATH%;" )
 message( STATUS "bsp: ${BUILD_SYS_PATH}")
 if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" )
@@ -47,13 +56,14 @@ if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" )
     file( APPEND ${BUILD_CMD_FILE} "${BUILD_SYS_PATH} \n" )
     file( APPEND ${BUILD_CMD_FILE} "${VSDEVCMD_BAT} \n" )
     file( APPEND ${BUILD_CMD_FILE} "dos2unix *\n" )
-    file( APPEND ${BUILD_CMD_FILE} "dos2unix -f configure\n" )
+    file( APPEND ${BUILD_CMD_FILE} "REM After asterisk\n" )
     file( APPEND ${BUILD_CMD_FILE} "dos2unix -f configure\n" )
     file( APPEND ${BUILD_CMD_FILE} "${CONF_ICU} \n" )
     file( APPEND ${BUILD_CMD_FILE} "make \n" )
     file( APPEND ${BUILD_CMD_FILE} "make install \n" )
     file( APPEND ${BUILD_CMD_FILE} "make clean \n" )
     file( APPEND ${BUILD_CMD_FILE} "make distclean \n" )
+    file( APPEND ${BUILD_CMD_FILE} "exit 0 \n" )
 elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" )
     message( FATAL_ERROR "Not impl for GNU compiler")
 else()
