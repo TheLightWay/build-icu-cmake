@@ -1,0 +1,6 @@
+message( STATUS "Prepare build for MinGW-W64" )
+
+get_filename_component( MINGW_COMPILER_DIR ${CMAKE_CXX_COMPILER} DIRECTORY )
+file( TO_NATIVE_PATH "${MINGW_COMPILER_DIR}" MINGW_COMPILER_DIR )
+set( VSVARSALL_BAT "set \"PATH=%PATH%;${MINGW_COMPILER_DIR}\"" ) 
+set( CONF_ICU "bash runConfigureICU MinGW -prefix=${DIST_DIR} -build=x86_64-w64-mingw32 -enable-static -disable-shared ${ICU_WITH_LIB_BITS}" )

@@ -22,7 +22,7 @@ set CYGWIN_SETUP=
 set CYGWIN_MIRROR=http://ftp.inf.tu-dresden.de/software/windows/cygwin32
 
 :: select the packages to be installed automatically: https://cygwin.com/packages/package_list.html
-set CYGWIN_PACKAGES=bind-utils,curl,inetutils,openssh,openssl,vim,whois
+set CYGWIN_PACKAGES=make,dos2unix,unix2dos,whois
 
 :: Cygwin uses ACLs to implement real Unix permissions which are not supported by Windows: https://cygwin.com/cygwin-ug-net/using-filemodes.html
 :: However, if you move installation to different directory or PC, ACLs will be broken and will have troubles running Cygwin binaries
@@ -33,29 +33,29 @@ set CYGWIN_PACKAGES=bind-utils,curl,inetutils,openssh,openssl,vim,whois
 set INSTALL_ACL=no
 
 :: install apt-cyg command line package manager: https://github.com/transcode-open/apt-cyg
-set INSTALL_APT_CYG=yes
+set INSTALL_APT_CYG=no
 
 :: install bash-funk adaptive Bash prompt: https://github.com/vegardit/bash-funk
-set INSTALL_BASH_FUNK=yes
+set INSTALL_BASH_FUNK=no
 
 :: install parallel ssh tool: https://github.com/zhubanRuban/cygwin-extras#pssh-parallelssh
-set INSTALL_PSSH=yes
+set INSTALL_PSSH=no
 
 :: install parallel scp tool: https://github.com/zhubanRuban/cygwin-extras#pscp-parallelscp
-set INSTALL_PSCP=yes
+set INSTALL_PSCP=no
 
 :: install SSH agent tweak https://github.com/zhubanRuban/cygwin-extras#ssh-agent-tweak
-set INSTALL_SSH_AGENT_TWEAK=yes
+set INSTALL_SSH_AGENT_TWEAK=no
 
 :: install custom bashrc rules for better experience https://github.com/zhubanRuban/cygwin-extras#custom-bashrc
 :: if set to 'yes', will disable bash-funk adaptive Bash prompt (see INSTALL_BASH_FUNK) to prevent conflicts
-set INSTALL_BASHRC_CUSTOMS=yes
+set INSTALL_BASHRC_CUSTOMS=no
 
 :: install WSLbridge to allowing to access WSL via Mintty https://github.com/rprichard/wslbridge
-set INSTALL_WSLBRIDGE=yes
+set INSTALL_WSLBRIDGE=no
 
 :: install multitab terminal https://conemu.github.io/
-set INSTALL_CONEMU=yes
+set INSTALL_CONEMU=no
 :: https://conemu.github.io/en/ConEmuArgs.html
 set CONEMU_OPTIONS=-Title ConCygSys
 
