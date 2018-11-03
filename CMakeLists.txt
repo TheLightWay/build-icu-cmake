@@ -29,7 +29,6 @@ if( NOT DEFINED BUILD_AS_SUBPROJECT )
     set( CMAKE_CXX_STANDARD 11 )
     set( CMAKE_CXX_STANDARD_REQUIRED ON )
 
-    # Adapted from LLVM's toplevel CMakeLists.txt file
     if( CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR )
         message(FATAL_ERROR "
             In-source builds are not allowed. CMake would overwrite the
@@ -48,13 +47,18 @@ if( NOT DEFINED BUILD_AS_SUBPROJECT )
     endif()
 endif()
 
+macro( cmake_do_file filename )
+    include( ${CMAKE_SOURCE_DIR}/scripts/${filename} )
+endmacro( cmake_do_file filename)
+
 set( BINDIR "${PROJECT_BINARY_DIR}" )
 set( BUILDDIR "${BINDIR}/_icu-build-dir" )
+set( DEPOTDIR "${CMAKE_CURRENT_LIST_DIR}/filedepot/win")
 set( DIST_DIR "${BUILDDIR}/icu-dist" CACHE PATH INTERNAL )
 
-if( EXISTS ${BUILDDIR} )
-    file( REMOVE_RECURSE ${BUILDDIR} )
-endif()
+#if( EXISTS ${BUILDDIR} )
+#    file( REMOVE_RECURSE ${BUILDDIR} )
+#endif()
 
 file( MAKE_DIRECTORY ${BUILDDIR} )
 
@@ -69,9 +73,9 @@ else()
 endif()
 
 if( WIN32 )
-    include( ${CMAKE_CURRENT_LIST_DIR}/MakeForWindows.txt )
+    cmake_do_file( MakeForWindows.txt )
 elseif( LINUX )
-    include( ${CMAKE_CURRENT_LIST_DIR}/MakeForLinux.txt )
+    cmake_do_file( MakeForLinux.txt )
 else()
     message( FATAL_ERROR "Unknown OS" )
 endif()

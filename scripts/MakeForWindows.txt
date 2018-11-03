@@ -1,8 +1,4 @@
 
-message( STATUS "Build ICU for Windows")
-
-set( DEPOTDIR "${CMAKE_CURRENT_LIST_DIR}/filedepot/win")
-
 #extract ICU sources and build tools
 if( NOT EXISTS "${BUILDDIR}/icu" )
     execute_process(
@@ -28,23 +24,30 @@ file( WRITE ${BUILD_CMD_FILE}  "@echo off \n" )
 file( APPEND ${BUILD_CMD_FILE} "setlocal \n" )
 
 if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" )
-    if( MSVC_TOOLSET_VERSION EQUAL 141 )
-        include( ${CMAKE_CURRENT_LIST_DIR}/MakeForMSVC17.txt )
-    else()
-        message( FATAL_ERROR "Need implement build script for this MSVC version" )
-    endif()
+    cmake_do_file( SwitchMSVCVersion.txt )
     set( CONF_ICU "bash runConfigureICU Cygwin/MSVC -prefix=${DIST_DIR} -enable-static -disable-shared ${ICU_WITH_LIB_BITS}" )
 elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" )
-    include( ${CMAKE_CURRENT_LIST_DIR}/MakeForMinGw-W64.txt  )
+    cmake_do_file( SwitchMinGWVersion.txt )
 else()
     message( FATAL_ERROR "Compiler curently not supported!" )
 endif()
 
 file( APPEND ${BUILD_CMD_FILE} "${BUILD_SYS_PATH} \n" )
-file( APPEND ${BUILD_CMD_FILE} "${VSVARSALL_BAT} \n" )
-file( APPEND ${BUILD_CMD_FILE} "dos2unix *\n" )
-file( APPEND ${BUILD_CMD_FILE} "REM After asterisk\n" )
-file( APPEND ${BUILD_CMD_FILE} "dos2unix -f configure\n" )
+file( APPEND ${BUILD_CMD_FILE} "${SETUP_COMPILER} \n" )
+
+file( GLOB DOSTOUNIX_FILES LIST_DIRECTORIES FALSE "${BUILDDIR}/icu/source/*" )
+list( LENGTH DOSTOUNIX_FILES D2UF_COUNT )
+set( D2UF_INDEX 0 )
+set( D2U_FILE "" )
+while( D2UF_INDEX LESS D2UF_COUNT )
+    list( GET DOSTOUNIX_FILES ${D2UF_INDEX} D2U_FILE )
+    get_filename_component( D2U_SHORT_FILE ${D2U_FILE} NAME )
+    if( NOT ${D2U_SHORT_FILE} STREQUAL "build.cmd")
+        file( APPEND ${BUILD_CMD_FILE} "dos2unix -f ${D2U_SHORT_FILE}\n" )
+    endif()
+    math( EXPR D2UF_INDEX "${D2UF_INDEX}+1" )
+endwhile( )
+
 file( APPEND ${BUILD_CMD_FILE} "${CONF_ICU} \n" )
 file( APPEND ${BUILD_CMD_FILE} "make \n" )
 file( APPEND ${BUILD_CMD_FILE} "make install \n" )

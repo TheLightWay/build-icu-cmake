@@ -1,4 +1,3 @@
-
 message( STATUS "Prepare build for VS 2017 (15.0)" )
 
 set( VSWHERE_CMD "${DEPOTDIR}/vswhere.exe" )
@@ -9,9 +8,9 @@ execute_process(
 )
 string(REGEX REPLACE "\n$" "" MSVC_PATH "${MSVC_PATH}" )
 if( "${CMAKE_SIZEOF_VOID_P}" STREQUAL "8" )
-    set( VSVARSALL_BAT "call \"${MSVC_PATH}\\Common7\\Tools\\VsDevCmd.bat\" -arch=amd64" )
+    set( SETUP_COMPILER "call \"${MSVC_PATH}\\Common7\\Tools\\VsDevCmd.bat\" -arch=amd64" )
 elseif( "${CMAKE_SIZEOF_VOID_P}" STREQUAL "4" )
-    set( VSVARSALL_BAT "call \"${MSVC_PATH}\\Common7\\Tools\\VsDevCmd.bat\" -arch=x86" )    
+    set( SETUP_COMPILER "call \"${MSVC_PATH}\\Common7\\Tools\\VsDevCmd.bat\" -arch=x86" )    
 else()
     message( FATAL_ERROR "Unexpected architecture, sizeof(void*): ${CMAKE_SIZEOF_VOID_P}" )
 endif()

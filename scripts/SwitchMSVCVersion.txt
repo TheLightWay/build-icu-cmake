@@ -1,0 +1,7 @@
+message( STATUS "Build ICU for Windows with MSVC")
+
+if( MSVC_TOOLSET_VERSION EQUAL 141 )
+    cmake_do_file( MakeForMSVC17.txt )
+else()
+    message( FATAL_ERROR "Need implement build script for this MSVC version" )
+endif()
